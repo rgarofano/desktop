@@ -44,7 +44,6 @@ git clone https://github.com/rgarofano/dwm.git
 (cd dwm && make && sudo make clean install)
 
 sudo dnf install -y greetd "${XORG_DEPS[@]}"
-chmod +x "$HOME/.xinitrc"
 cat <<EOF | sudo tee /etc/greetd/config.toml
 [terminal]
 vt = 1
