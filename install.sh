@@ -1,8 +1,37 @@
 #!/usr/bin/env bash
 
 BOOT_SPLASH_DEPS=(plymouth)
-DWM_DEPS=(git make gcc libXft-devel libX11-devel libXinerama-devel xorg-x11-server-Xorg dmenu)
-LOGIN_DEPS=(greetd xorg-x11-xinit)
+
+DWM_DEPS=(
+    git
+    make
+    gcc 
+    libXft-devel
+    libX11-devel
+    libXinerama-devel
+)
+
+XORG_DEPS=(
+    setxkbmap
+    xev
+    xorg-x11-server-Xorg
+    xorg-x11-xinit
+    xprop    
+    xrandr
+    xrdb
+    xsetroot
+)
+
+USER_PROGRAMS=(
+    alacritty
+    dmenu
+    firefox
+    mpv
+    picom
+    yt-dlp
+)
+
+NERD_FONTS=(FiraCode)
 
 # Prompt for password immediately
 sudo -n true
@@ -14,11 +43,7 @@ sudo dnf install -y "${DWM_DEPS[@]}"
 git clone https://github.com/rgarofano/dwm.git
 (cd dwm && make && sudo make clean install)
 
-sudo dnf install -y "${LOGIN_DEPS[@]}"
-cat <<EOF > "$HOME/.xinitrc"
-#!/usr/bin/env bash
-exec dwm
-EOF
+sudo dnf install -y greetd "${XORG_DEPS[@]}"
 chmod +x "$HOME/.xinitrc"
 cat <<EOF | sudo tee /etc/greetd/config.toml
 [terminal]
@@ -33,3 +58,26 @@ command = "startx"
 user = "$USER"
 EOF
 sudo systemctl enable greetd.service
+
+sudo dnf install -y "${USER_PROGRAMS[@]}"
+
+cat <<EOF > "$HOME/.xinitrc"
+xrdb -merge <<< "Xft.dpi: 144"
+xrandr --output DP-0 --mode 3840x2160 --rate 120
+
+setxkbmap -option caps:escape
+xmodmap -e "keycode 135 = Super_L"
+
+picom --backend glx --vsync &
+
+exec dwm
+EOF
+
+git clone --depth 1 --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts.git
+cd nerd-fonts
+for font in "${NERD_FONTS[@]}"; do
+    git sparse-checkout add "patched-fonts/$font"
+done
+./install.sh "${NERD_FONTS[@]}"
+cd ..
+rm -rf nerd-fonts
