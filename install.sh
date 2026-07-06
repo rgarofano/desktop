@@ -24,31 +24,37 @@ XORG_DEPS=(
     xsetroot
 )
 
+LOGIN_DEPS=(greetd)
+
 USER_PROGRAMS=(
     alacritty
     dmenu
     fastfetch
+    feh
     firefox
     mpv
     neovim
     picom
+    stow
     tmux
     yt-dlp
 )
 
 NERD_FONTS=(FiraCode)
 
-# Prompt for password immediately
-sudo -n true
+WALLPAPERS=(
+    apocalypse
+    minimal
+    monochrome
+)
 
-sudo dnf install -y "${BOOT_SPLASH_DEPS[@]}"
+sudo dnf install -y "${BOOT_SPLASH_DEPS[@]}" "${DWM_DEPS[@]}" "${XORG_DEPS[@]}" "${LOGIN_DEPS[@]}" "${USER_PROGRAMS[@]}"
+
 sudo grubby --update-kernel=ALL --args="rhgb quiet"
 
-sudo dnf install -y "${DWM_DEPS[@]}"
 git clone https://github.com/rgarofano/dwm.git
 (cd dwm && make && sudo make clean install)
 
-sudo dnf install -y greetd "${XORG_DEPS[@]}"
 cat <<EOF | sudo tee /etc/greetd/config.toml
 [terminal]
 vt = 1
@@ -63,7 +69,28 @@ user = "$USER"
 EOF
 sudo systemctl enable greetd.service
 
-sudo dnf install -y "${USER_PROGRAMS[@]}"
+git clone --depth 1 --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts.git
+cd nerd-fonts
+for font in "${NERD_FONTS[@]}"; do
+    git sparse-checkout add "patched-fonts/$font"
+done
+./install.sh "${NERD_FONTS[@]}"
+cd ..
+rm -rf nerd-fonts
+
+git clone https://github.com/rgarofano/dotfiles.git
+cd dotfiles
+for package in */; do
+    stow "$package"
+done
+cd ..
+
+git clone --depth 1 --filter=blob:none --sparse https://github.com/rgarofano/wallpapers.git "$HOME/.local/share/wallpapers"
+cd "$HOME/.local/share/wallpapers"
+for theme in "${WALLPAPERS[@]}"; do
+    git sparse-checkout add "$theme"
+done
+cd -
 
 cat <<EOF > "$HOME/.xinitrc"
 xrdb -merge <<< "Xft.dpi: 144"
@@ -74,22 +101,7 @@ xmodmap -e "keycode 135 = Super_L"
 
 picom --backend glx --vsync &
 
+feh --bg-scale "$(find $HOME/.local/share/wallpapers -type f -name '*.jpg' | shuf -n 1)"
+
 exec dwm
 EOF
-
-git clone --depth 1 --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts.git
-cd nerd-fonts
-for font in "${NERD_FONTS[@]}"; do
-    git sparse-checkout add "patched-fonts/$font"
-done
-./install.sh "${NERD_FONTS[@]}"
-cd ..
-rm -rf nerd-fonts
-
-sudo dnf install -y stow
-git clone https://github.com/rgarofano/dotfiles.git
-cd dotfiles
-for package in */; do
-    stow "$package"
-done
-cd ..
