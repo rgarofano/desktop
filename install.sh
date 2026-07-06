@@ -26,6 +26,13 @@ XORG_DEPS=(
 
 LOGIN_DEPS=(greetd)
 
+AUDIO_DEPS=(
+    pipewire
+    wireplumber
+    pipewire-pulseaudio
+    pamixer
+)
+
 USER_PROGRAMS=(
     alacritty
     dmenu
@@ -49,7 +56,7 @@ WALLPAPERS=(
     monochrome
 )
 
-sudo dnf install -y "${BOOT_SPLASH_DEPS[@]}" "${DWM_DEPS[@]}" "${XORG_DEPS[@]}" "${LOGIN_DEPS[@]}" "${USER_PROGRAMS[@]}"
+sudo dnf install -y "${BOOT_SPLASH_DEPS[@]}" "${DWM_DEPS[@]}" "${XORG_DEPS[@]}" "${LOGIN_DEPS[@]}" "${AUDIO_DEPS[@]}" "${USER_PROGRAMS[@]}"
 
 sudo grubby --update-kernel=ALL --args="rhgb quiet"
 
