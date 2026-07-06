@@ -99,7 +99,7 @@ xrandr --output DP-0 --mode 3840x2160 --rate 120
 setxkbmap -option caps:escape
 xmodmap -e "keycode 135 = Super_L"
 
-picom --backend glx --vsync &
+picom &
 
 feh --bg-scale "$(find $HOME/.local/share/wallpapers -type f -name '*.jpg' | shuf -n 1)"
 
