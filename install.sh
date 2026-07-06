@@ -27,6 +27,7 @@ XORG_DEPS=(
 USER_PROGRAMS=(
     alacritty
     dmenu
+    fastfetch
     firefox
     mpv
     neovim
