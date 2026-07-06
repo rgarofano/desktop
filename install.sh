@@ -63,6 +63,14 @@ sudo grubby --update-kernel=ALL --args="rhgb quiet"
 git clone https://github.com/rgarofano/dwm.git
 (cd dwm && make && sudo make clean install)
 
+git clone https://github.com/rgarofano/dwmblocks.git
+cd dwmblocks
+mkdir -p "$HOME/.local/bin"
+cp scripts/* "$HOME/.local/bin"
+make
+sudo make install
+cd ..
+
 cat <<EOF | sudo tee /etc/greetd/config.toml
 [terminal]
 vt = 1
@@ -84,7 +92,6 @@ for font in "${NERD_FONTS[@]}"; do
 done
 ./install.sh "${NERD_FONTS[@]}"
 cd ..
-rm -rf nerd-fonts
 
 git clone https://github.com/rgarofano/dotfiles.git
 cd dotfiles
@@ -111,5 +118,12 @@ picom &
 
 feh --bg-scale "$(find $HOME/.local/share/wallpapers -type f -name '*.jpg' | shuf -n 1)"
 
+dwmblocks &
+
 exec dwm
 EOF
+
+# Cleanup
+rm -rf dwm
+rm -rf dwmblocks
+rm -rf nerd-fonts
