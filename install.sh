@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+shopt -s dotglob
+
 BOOT_SPLASH_DEPS=(plymouth)
 
 DWM_DEPS=(
@@ -27,7 +29,9 @@ USER_PROGRAMS=(
     dmenu
     firefox
     mpv
+    neovim
     picom
+    tmux
     yt-dlp
 )
 
@@ -80,3 +84,11 @@ done
 ./install.sh "${NERD_FONTS[@]}"
 cd ..
 rm -rf nerd-fonts
+
+sudo dnf install -y stow
+git clone https://github.com/rgarofano/dotfiles.git
+cd dotfiles
+for package in */; do
+    stow "$package"
+done
+cd ..
