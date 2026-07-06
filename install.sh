@@ -35,6 +35,7 @@ USER_PROGRAMS=(
     mpv
     neovim
     picom
+    redshift
     stow
     tmux
     yt-dlp
