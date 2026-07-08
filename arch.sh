@@ -36,6 +36,8 @@ PACKAGES=(
     firefox
     # Editor
     neovim
+    # Keyboard remapping
+    keyd
     # Other
     fastfetch
     mpv

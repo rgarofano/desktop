@@ -64,9 +64,6 @@ cat <<EOF > "$HOME/.xinitrc"
 xrdb -merge <<< "Xft.dpi: 144"
 xrandr --output DP-0 --mode 3840x2160 --rate 120
 
-setxkbmap -option caps:escape
-xmodmap -e "keycode 135 = Super_L"
-
 picom &
 
 feh --bg-scale "$(find $HOME/.local/share/wallpapers -type f -name '*.jpg' | shuf -n 1)"
@@ -90,6 +87,11 @@ git clone https://github.com/rgarofano/dotfiles.git
 cd dotfiles
 for package in */; do
     stow "$package"
+    if [[ $package == "keyd" ]]; then
+        sudo mkdir -p /etc/keyd
+        sudo ln -sf "$HOME/.config/keyd/default.conf" /etc/keyd/default.conf
+        sudo systemctl enable keyd.service
+    fi
 done
 cd ..
 
@@ -105,3 +107,5 @@ cd -
 rm -rf dwm
 rm -rf dwmblocks
 rm -rf nerd-fonts
+
+echo "Installation complete! You can now reboot into your new system"

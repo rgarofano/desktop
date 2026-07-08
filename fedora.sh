@@ -39,12 +39,15 @@ PACKAGES=(
     firefox
     # Editor
     neovim
+    # Keyboard remapping
+    keyd
     # Other
     fastfetch
     mpv
     yt-dlp
 )
 
+sudo dnf copr enable -y alternateved/keyd
 sudo dnf install -y "${PACKAGES[@]}"
 
 # Update boot splash screen
