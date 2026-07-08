@@ -2,52 +2,6 @@
 
 shopt -s dotglob
 
-BOOT_SPLASH_DEPS=(plymouth)
-
-DWM_DEPS=(
-    git
-    make
-    gcc 
-    libXft-devel
-    libX11-devel
-    libXinerama-devel
-)
-
-XORG_DEPS=(
-    setxkbmap
-    xev
-    xorg-x11-server-Xorg
-    xorg-x11-xinit
-    xprop    
-    xrandr
-    xrdb
-    xsetroot
-)
-
-LOGIN_DEPS=(greetd)
-
-AUDIO_DEPS=(
-    pipewire
-    wireplumber
-    pipewire-pulseaudio
-    pamixer
-)
-
-USER_PROGRAMS=(
-    alacritty
-    dmenu
-    fastfetch
-    feh
-    firefox
-    mpv
-    neovim
-    picom
-    redshift
-    stow
-    tmux
-    yt-dlp
-)
-
 NERD_FONTS=(FiraCode)
 
 WALLPAPERS=(
@@ -56,13 +10,31 @@ WALLPAPERS=(
     monochrome
 )
 
-sudo dnf install -y "${BOOT_SPLASH_DEPS[@]}" "${DWM_DEPS[@]}" "${XORG_DEPS[@]}" "${LOGIN_DEPS[@]}" "${AUDIO_DEPS[@]}" "${USER_PROGRAMS[@]}"
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
-sudo grubby --update-kernel=ALL --args="rhgb quiet"
+# Install required packages
+. /etc/os-release
+case "$ID" in
+    debian|ubuntu)
+        . "$SCRIPT_DIR/debian.sh"
+        ;;
+    fedora)
+        . "$SCRIPT_DIR/fedora.sh"
+        ;;
+    arch)
+        . "$SCRIPT_DIR/arch.sh"
+        ;;
 
+    *)
+        echo "Error: unsupported distribution \'$ID\'" >&2
+        exit 1
+esac
+
+# Install window manager
 git clone https://github.com/rgarofano/dwm.git
 (cd dwm && make && sudo make clean install)
 
+# Install status bar
 git clone https://github.com/rgarofano/dwmblocks.git
 cd dwmblocks
 mkdir -p "$HOME/.local/bin"
@@ -71,7 +43,8 @@ make
 sudo make install
 cd ..
 
-cat <<EOF | sudo tee /etc/greetd/config.toml
+# Setup autologin
+sudo tee /etc/greetd/config.toml >/dev/null <<EOF
 [terminal]
 vt = 1
 
@@ -85,28 +58,8 @@ user = "$USER"
 EOF
 sudo systemctl enable greetd.service
 
-git clone --depth 1 --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts.git
-cd nerd-fonts
-for font in "${NERD_FONTS[@]}"; do
-    git sparse-checkout add "patched-fonts/$font"
-done
-./install.sh "${NERD_FONTS[@]}"
-cd ..
-
-git clone https://github.com/rgarofano/dotfiles.git
-cd dotfiles
-for package in */; do
-    stow "$package"
-done
-cd ..
-
-git clone --depth 1 --filter=blob:none --sparse https://github.com/rgarofano/wallpapers.git "$HOME/.local/share/wallpapers"
-cd "$HOME/.local/share/wallpapers"
-for theme in "${WALLPAPERS[@]}"; do
-    git sparse-checkout add "$theme"
-done
-cd -
-
+# The following will run at startup/login
+# See https://wiki.archlinux.org/title/Xinit
 cat <<EOF > "$HOME/.xinitrc"
 xrdb -merge <<< "Xft.dpi: 144"
 xrandr --output DP-0 --mode 3840x2160 --rate 120
@@ -122,6 +75,31 @@ dwmblocks &
 
 exec dwm
 EOF
+
+# Install nerd font(s) of choice
+git clone --depth 1 --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts.git
+cd nerd-fonts
+for font in "${NERD_FONTS[@]}"; do
+    git sparse-checkout add "patched-fonts/$font"
+done
+./install.sh "${NERD_FONTS[@]}"
+cd ..
+
+# Install my dotfiles
+git clone https://github.com/rgarofano/dotfiles.git
+cd dotfiles
+for package in */; do
+    stow "$package"
+done
+cd ..
+
+# Download wallpapers
+git clone --depth 1 --filter=blob:none --sparse https://github.com/rgarofano/wallpapers.git "$HOME/.local/share/wallpapers"
+cd "$HOME/.local/share/wallpapers"
+for theme in "${WALLPAPERS[@]}"; do
+    git sparse-checkout add "$theme"
+done
+cd -
 
 # Cleanup
 rm -rf dwm
