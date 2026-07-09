@@ -26,6 +26,9 @@ PACKAGES=(
     redshift
     # Symlink manager for dotfiles
     stow
+    # Screenshots
+    maim
+    xclip
     # Terminal
     alacritty
     tmux
