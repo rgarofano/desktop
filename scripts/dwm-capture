@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+IMAGE_DIR=$HOME/Pictures
+ICON_DIR=$HOME/.local/share/icons
+
+case "$1" in
+    "screenshot")
+        save_path=$IMAGE_DIR/$(date +%F-%H%M%S).png
+        maim "$save_path"
+        notify-send -i "$ICON_DIR/camera.png" "Screenshot" "saved as $save_path"
+        ;;
+    "snippet")
+        maim -s | xclip -selection clipboard -t image/png
+        notify-send -i "$ICON_DIR/camera.png" "Snippet" "copied to clipboard"
+        ;;
+    *)
+        echo "Usage: dwm-capture screenshot" >&2
+        echo "       dwm-capture snippet" >&2
+        exit 1
+esac
