@@ -57,5 +57,10 @@ PACKAGES=(
 sudo dnf copr enable -y alternateved/keyd
 sudo dnf install -y "${PACKAGES[@]}"
 
+if lspci -nn | grep -Ei 'VGA|3D|Display' | grep -qi 'nvidia'; then
+    sudo dnf install -y https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+    sudo dnf install -y akmod-nvidia
+fi
+
 # Update boot splash screen
 sudo grubby --update-kernel=ALL --args="rhgb quiet"

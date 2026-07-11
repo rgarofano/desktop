@@ -51,4 +51,8 @@ PACKAGES=(
     yt-dlp
 )
 
+if lspci -nn | grep -Ei 'VGA|3D|Display' | grep -qi 'nvidia'; then
+    sudo pacman -S --noconfirm nvidia
+fi
+
 sudo pacman -Syu --noconfirm "${PACKAGES[@]}"
