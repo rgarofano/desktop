@@ -59,25 +59,6 @@ user = "$USER"
 EOF
 sudo systemctl enable greetd.service
 
-# The following will run at startup/login
-# See https://wiki.archlinux.org/title/Xinit
-cat <<EOF > "$HOME/.xinitrc"
-xrdb -merge <<< "Xft.dpi: 144"
-xrandr --output DP-0 --mode 3840x2160 --rate 120
-
-picom &
-
-redshift &
-
-feh --bg-scale "$(find $HOME/.local/share/wallpapers -type f -name '*.jpg' | shuf -n 1)"
-
-dunst &
-
-dwmblocks &
-
-exec dwm
-EOF
-
 # Install nerd font(s) of choice
 git clone --depth 1 --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts.git
 cd nerd-fonts
