@@ -16,6 +16,7 @@ PACKAGES=(
     # Audio
     pamixer
     pipewire-pulse
+    playerctl
     # App launcher
     dmenu
     # Wallpapers

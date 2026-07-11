@@ -18,6 +18,7 @@ PACKAGES=(
     # Audio
     pamixer
     pipewire-pulse
+    playerctl
     wireplumber
     # App launcher
     dmenu

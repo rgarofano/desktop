@@ -20,8 +20,9 @@ PACKAGES=(
     # Display/Login manager
     greetd
     # Audio
-    pipewire-pulseaudio
     pamixer
+    pipewire-pulseaudio
+    playerctl
     # App launcher
     dmenu
     # Wallpapers
