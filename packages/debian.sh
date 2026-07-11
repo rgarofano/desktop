@@ -30,6 +30,9 @@ PACKAGES=(
     # Screenshots
     maim
     xclip
+    # Notifications
+    libnotify-bin
+    dunst
     # Terminal
     alacritty
     tmux
