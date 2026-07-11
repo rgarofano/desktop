@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+state=$(cat /sys/class/power_supply/BAT0/status)
+capacity=$(cat /sys/class/power_supply/BAT0/capacity)
+
+if [[ $state == "Charging" ]]; then
+    icon="󰂄"
+else
+    if (( $capacity <= 10 )); then
+        icon="󰁺"
+    elif (( $capacity <= 20 )); then
+        icon="󰁻"
+    elif (( $capacity <= 30 )); then
+        icon="󰁼"
+    elif (( $capacity <= 40 )); then
+        icon="󰁽"
+    elif (( $capacity <= 50 )); then
+        icon="󰁾"
+    elif (( $capacity <= 60 )); then
+        icon="󰁿"
+    elif (( $capacity <= 70 )); then
+        icon="󰂀"
+    elif (( $capacity <= 80 )); then
+        icon="󰂁"
+    elif (( $capacity <= 90 )); then
+        icon="󰂂"
+    else
+        icon="󰁹"
+    fi
+fi
+
+printf "$icon %2d%%\n" "$capacity"

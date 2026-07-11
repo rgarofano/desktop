@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+update_status_bar() {
+    pkill -RTMIN+10 dwmblocks
+}
+
+is_reasonable_value() {
+    if (( $1 > 0 && $1 <= 100 )); then
+        return 0
+    fi
+
+    echo "Error: must adjust volume in increments between 1 and 100" >&2
+    return 1
+}
+
+increase_volume() {
+    if is_reasonable_value "$1"; then
+        pamixer -i "$1"
+        update_status_bar
+    fi
+}
+
+decrease_volume() {
+    if is_reasonable_value "$1"; then
+        pamixer -d "$1"
+        update_status_bar
+    fi
+}
+
+toggle_mute() {
+    pamixer -t
+    update_status_bar
+}
+
+case "$1" in
+    "up")
+        increase_volume "${2:-5}"
+        ;;
+    "down")
+        decrease_volume "${2:-5}"
+        ;;
+    "toggle-mute")
+        toggle_mute
+        ;;
+    *)
+        echo "Usage: dwm-volume up [VALUE]" >&2
+        echo "       dwm-volume down [VALUE]" >&2
+        echo "       dwm-volume toggle-mute" >&2
+        exit 1
+esac

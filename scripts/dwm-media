@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+ICON_PATH="$HOME/.local/share/icons"
+
+get_media_info() {
+    title=$(playerctl metadata title 2>/dev/null)
+    artist=$(playerctl metadata artist 2>/dev/null)
+
+    if [[ -n $artist ]]; then
+        echo "$title - $artist"
+    else
+        echo "$title"
+    fi
+}
+
+play_pause() {
+    status=$(playerctl status)
+
+    case "$status" in
+        Playing)
+            playerctl pause
+            notify-send -i "$ICON_PATH/pause.png" "Paused" "$(get_media_info)"
+            ;;
+        Paused)
+            playerctl play
+            notify-send -i "$ICON_PATH/play.png" "Playing" "$(get_media_info)"
+            ;;
+        Stopped)
+            notify-send -i "$ICON_PATH/warning.png" "Nothing to play"
+            ;;
+        *)
+            notify-send -i "$ICON_PATH/warning.png" "No player available"
+            ;;
+    esac
+}
+
+case "$1" in
+    "play-pause")
+        play_pause
+        ;;
+    "next")
+        playerctl next
+        sleep 0.5
+        notify-send -i "$ICON_PATH/next.png" "Playing" "$(get_media_info)"
+        ;;
+    "previous")
+        playerctl previous
+        sleep 0.5
+        notify-send -i "$ICON_PATH/previous.png" "Playing" "$(get_media_info)"
+        ;;
+    *)
+        echo "Usage: dwm-media play-pause" >&2
+        echo "       dwm-media next" >&2
+        echo "       dwm-media previous" >&2
+        exit 1
+esac

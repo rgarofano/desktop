@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-shopt -s dotglob
-
 NERD_FONTS=(FiraCode)
 
 WALLPAPERS=(
@@ -16,13 +14,13 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 . /etc/os-release
 case "$ID" in
     debian|ubuntu)
-        . "$SCRIPT_DIR/debian.sh"
+        . "$SCRIPT_DIR/packages/debian.sh"
         ;;
     fedora)
-        . "$SCRIPT_DIR/fedora.sh"
+        . "$SCRIPT_DIR/packages/fedora.sh"
         ;;
     arch)
-        . "$SCRIPT_DIR/arch.sh"
+        . "$SCRIPT_DIR/packages/arch.sh"
         ;;
 
     *)
@@ -30,18 +28,21 @@ case "$ID" in
         exit 1
 esac
 
+# Deploy scripts
+mkdir -p "$HOME/.local/bin"
+cp "$SCRIPT_DIR/scripts/*" "$HOME/.local/bin"
+
+# Deploy icons
+mkdir -p "$HOME/.local/share/icons"
+cp "$SCRIPT_DIR/icons/*" "$HOME/.local/share/icons"
+
 # Install window manager
 git clone https://github.com/rgarofano/dwm.git
 (cd dwm && make && sudo make clean install)
 
 # Install status bar
 git clone https://github.com/rgarofano/dwmblocks.git
-cd dwmblocks
-mkdir -p "$HOME/.local/bin"
-cp scripts/* "$HOME/.local/bin"
-make
-sudo make install
-cd ..
+(cd dwmblocks && make && sudo make install)
 
 # Setup autologin
 sudo tee /etc/greetd/config.toml >/dev/null <<EOF
@@ -70,6 +71,8 @@ redshift &
 
 feh --bg-scale "$(find $HOME/.local/share/wallpapers -type f -name '*.jpg' | shuf -n 1)"
 
+dunst &
+
 dwmblocks &
 
 exec dwm
@@ -84,9 +87,10 @@ done
 ./install.sh "${NERD_FONTS[@]}"
 cd ..
 
-# Install my dotfiles
+# Deploy my dotfiles
 git clone https://github.com/rgarofano/dotfiles.git
 cd dotfiles
+shopt -s dotglob
 for package in */; do
     stow "$package"
     if [[ $package == "keyd" ]]; then

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+is_muted=$(pamixer --sink @DEFAULT_SINK@ --get-mute)
+volume=$(pamixer --sink @DEFAULT_SINK@ --get-volume)
+
+if [[ $is_muted == "true" ]]; then
+    printf " %3d%%" "$volume"
+else
+    printf " %3d%%" "$volume"
+fi

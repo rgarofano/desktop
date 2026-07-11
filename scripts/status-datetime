@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+printf "%-20s" "$(date '+%a %d %b %I:%M %p')"
