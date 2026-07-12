@@ -1,5 +1,20 @@
 #!/usr/bin/env bash
 
+################################################################################
+# This script reads /proc/stat which provides cumulative totals for cpu time   #
+# since boot. Because these totals are cumulative, we cannot determine the     #
+# current cpu usage by reading the file once. We must read the file at two     #
+# different times to determine how much total cpu time has gone up, and how    #
+# much of that time was spent idle. Once we have this data we can calculate    #
+# current cpu usage with the following formula:                                #
+#                                                                              #
+#   (1 - cpu_time_idle/total_cpu_time) * 100%                                  #
+#                                                                              #
+# or equivalently:                                                             #
+#                                                                              #
+#   ((total_cpu_time - idle_cpu_time) / total_cpu_time) * 100%                 #
+################################################################################
+
 cpu_stats() {
     awk '/cpu / {
         idle = $5 + $6;
