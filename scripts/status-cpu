@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+cpu_stats() {
+    awk '/cpu / {
+        idle = $5 + $6;
+        non_idle = $2 + $3 + $4 + $7 + $8 + $9;
+        total = idle + non_idle;
+        print idle, total;
+    }' /proc/stat
+}
+
+read idle_prev total_prev < <(cpu_stats)
+sleep 1
+read idle_curr total_curr < <(cpu_stats)
+
+idle_delta=$(( idle_curr - idle_prev ))
+total_delta=$(( total_curr - total_prev ))
+usage=$(( 100 * (total_delta - idle_delta) / total_delta ))
+
+printf '%3d%%' "$usage"
