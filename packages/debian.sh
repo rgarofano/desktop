@@ -48,4 +48,11 @@ PACKAGES=(
     yt-dlp
 )
 
-sudo apt-get update && sudo apt-get install -y "${PACKAGES[@]}"
+sudo apt-get update
+
+if ! command -v nmcli; then
+    sudo apt-get install network-manager
+    sudo systemctl enable NetworkManager.service
+fi
+
+sudo apt-get install -y "${PACKAGES[@]}"
