@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+connected_device=$(nmcli -t -f DEVICE,TYPE,STATE device | grep 'connected$' | head -1)
+
+if [[ -z $connected_device ]]; then
+    echo "󰯡 No Network"
+    exit 0
+fi
+
+device_type=$(cut -d ':' -f 2 <<<"$connected_device")
+device_name=$(cut -d ':' -f 1 <<<"$connected_device")
+
+if [[ $device_type == "ethernet" ]]; then
+    echo "󰈀 wired"
+elif [[ $device_type == "wifi" ]]; then
+    ssid=$(nmcli -t -f ACTIVE,SSID device wifi | grep '^yes' | cut -d ':' -f 2)
+    echo "  $ssid"
+fi

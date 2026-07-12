@@ -31,6 +31,7 @@ esac
 # Deploy scripts
 mkdir -p "$HOME/.local/bin"
 cp "$SCRIPT_DIR/scripts/*" "$HOME/.local/bin"
+sudo cp "$HOME/.local/bin/update-network-status" /etc/NetworkManager/dispatcher.d/
 
 # Deploy icons
 mkdir -p "$HOME/.local/share/icons"

@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+################################################################################
+# This script should be placed in /etc/NetworkManager/dispatcher.d/            #
+#                                                                              #
+# Any script placed in that directory will be run by NetworkManager when a     #
+# network related event occurs. The status bar (dwmblocks) has been configured #
+# to only update the network info in the status bar when receiving signal 11.  #
+# This script sends the signal, ensuring that our status bar updates are       #
+# completely event driven.                                                     #
+################################################################################
+
+pkill -RTMIN+11 dwmblocks
