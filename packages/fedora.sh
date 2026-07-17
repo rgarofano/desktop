@@ -49,7 +49,6 @@ PACKAGES=(
     # Keyboard remapping
     keyd
     # Other
-    fastfetch
     mpv
     yt-dlp
 )
